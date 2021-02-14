@@ -1,10 +1,31 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
 import * as Rx from 'rxjs'
 
-export const useManualSubscription = <T extends {}>(data$: Rx.Observable<T>, initialValue: T) => {
+export function useManualSubscription<T, P>(
+  getData$: (param: P) => Rx.Observable<T>,
+  initialState: T,
+  deps: any[]
+): {
+  data: T
+  subscribe: (params: P) => void
+  setData: (val: T) => void
+}
+export function useManualSubscription<T>(
+  data$: Rx.Observable<T>,
+  initialState: T
+): {
+  data: T
+  subscribe: () => void
+  setData: (val: T) => void
+}
+export function useManualSubscription<T, P = void>(
+  data$: ((param: P) => Rx.Observable<T>) | Rx.Observable<T>,
+  initialValue: T,
+  deps?: any[]
+) {
   const [data, setDataState] = useState(initialValue)
 
   // (Possible) subscription
@@ -19,20 +40,30 @@ export const useManualSubscription = <T extends {}>(data$: Rx.Observable<T>, ini
     )
   }, [])
 
+  const d = useMemo(() => deps || data$, [deps, data$])
+
   useEffect(() => {
     // Unsubscribe of possible subscription in case source data$ stream changed
-    unsubscribe()
+    // unsubscribe()
     return () => {
       // Unsubscribe of possible subscription in case of unmount
       unsubscribe()
     }
-  }, [data$, unsubscribe])
+  }, [d, unsubscribe])
 
-  const subscribe = useCallback(() => {
-    // Unsubscribe of possible subscription in case of new subscription
-    unsubscribe()
-    subRef.current = O.some(data$.subscribe(setDataState))
-  }, [data$, unsubscribe])
+  const subscribe = useCallback(
+    <Params>(params: Params extends P ? P : void) => {
+      // Unsubscribe of possible subscription in case of new subscription
+      unsubscribe()
+
+      if (Rx.isObservable(data$)) {
+        subRef.current = O.some(data$.subscribe(setDataState))
+      } else {
+        subRef.current = O.some(data$(params as P).subscribe(setDataState))
+      }
+    },
+    [data$, unsubscribe]
+  )
 
   const setData = useCallback(
     (value: T) => {

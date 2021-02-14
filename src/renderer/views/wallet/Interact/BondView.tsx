@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { AssetRuneNative, BaseAmount, baseToAsset } from '@xchainjs/xchain-util'
@@ -7,7 +7,6 @@ import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
-import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { Bond } from '../../../components/interact/forms'
@@ -16,6 +15,7 @@ import { ZERO_ASSET_AMOUNT } from '../../../const'
 import { useThorchainContext } from '../../../contexts/ThorchainContext'
 import { useWalletContext } from '../../../contexts/WalletContext'
 import { eqAsset } from '../../../helpers/fp/eq'
+import { useManualSubscription } from '../../../hooks/useManualSubscription'
 import { INITIAL_INTERACT_STATE } from '../../../services/thorchain/const'
 import { AddressValidation } from '../../../services/thorchain/types'
 import { InteractState } from '../../../services/thorchain/types'
@@ -26,10 +26,11 @@ type Props = {
   goToTransaction: (txHash: string) => void
 }
 
+type InteractParams = { amount: BaseAmount; memo: string }
+
 export const BondView: React.FC<Props> = ({ walletAddress, goToTransaction }) => {
   const { balancesState$ } = useWalletContext()
-  const [interactState, setInteractState] = useState<InteractState>(INITIAL_INTERACT_STATE)
-  const { interact$, client$ } = useThorchainContext()
+  const { interact$: getInteract$, client$ } = useThorchainContext()
   const intl = useIntl()
 
   const oClient = useObservableState(client$, O.none)
@@ -43,8 +44,6 @@ export const BondView: React.FC<Props> = ({ walletAddress, goToTransaction }) =>
       ),
     [oClient]
   )
-
-  const oSubRef = useRef<O.Option<Rx.Subscription>>(O.none)
 
   const [runeBalance] = useObservableState(
     () =>
@@ -68,19 +67,23 @@ export const BondView: React.FC<Props> = ({ walletAddress, goToTransaction }) =>
     ZERO_ASSET_AMOUNT
   )
 
-  const unsubscribeSub = useCallback(() => {
-    FP.pipe(
-      oSubRef.current,
-      O.map((sub) => sub.unsubscribe())
-    )
-  }, [])
+  const { subscribe: interact, data: interactState, setData: setInteractState } = useManualSubscription<
+    InteractState,
+    InteractParams
+  >(
+    ({ amount, memo }) => {
+      console.log('get new stream')
+      return getInteract$({ amount, memo })
+    },
+    INITIAL_INTERACT_STATE,
+    [getInteract$]
+  )
 
   const bondTx = useCallback(
     ({ amount, memo }: { amount: BaseAmount; memo: string }) => {
-      unsubscribeSub()
-      oSubRef.current = O.some(interact$({ amount, memo }).subscribe(setInteractState))
+      interact({ amount, memo })
     },
-    [interact$, setInteractState, unsubscribeSub]
+    [interact]
   )
   const resetResults = useCallback(() => {
     setInteractState(INITIAL_INTERACT_STATE)
@@ -98,13 +101,6 @@ export const BondView: React.FC<Props> = ({ walletAddress, goToTransaction }) =>
       )}: ${stepLabels[interactState.step - 1]}...`,
     [interactState, stepLabels, intl]
   )
-
-  useEffect(() => {
-    // Unsubscribe from possible subscription when unmount
-    return () => {
-      unsubscribeSub()
-    }
-  }, [unsubscribeSub])
 
   return FP.pipe(
     interactState.txRD,

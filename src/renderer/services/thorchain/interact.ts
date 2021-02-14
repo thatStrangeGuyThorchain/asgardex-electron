@@ -46,7 +46,11 @@ export const createInteractService$ = (
       amount,
       memo
     }),
+    RxOp.tap((s) => {
+      console.log('s --- ', s)
+    }),
     liveData.chain((txHash) => {
+      console.log('txHash --- ', txHash)
       // Update state
       setState({ ...getState(), step: 2, txRD: RD.progress({ loaded: 66, total }) })
       // 2. check tx finality
