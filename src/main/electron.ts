@@ -88,15 +88,15 @@ const initMainWindow = async () => {
       // Disable Node.js integration
       // This recommendation is the default behavior in Electron since 5.0.0.
       // ^ https://www.electronjs.org/docs/tutorial/security#2-do-not-enable-nodejs-integration-for-remote-content
-      nodeIntegration: false,
+      nodeIntegration: true,
       // Context Isolation
       // ^ https://www.electronjs.org/docs/tutorial/context-isolation
       // From Electron 12, it will be enabled by default.
       contextIsolation: true,
       // Disable `remote` module
       // https://www.electronjs.org/docs/tutorial/security#15-disable-the-remote-module
-      enableRemoteModule: false,
-      // experimentalFeatures: true,
+      enableRemoteModule: true,
+      experimentalFeatures: true,
       // preload script
       preload: join(__dirname, IS_DEV ? '../../public/' : '../build/', 'preload.js')
     }
