@@ -56,7 +56,6 @@
     "@devexperts/rx-utils": "^1.0.0-alpha.14",
     "@devexperts/utils": "^1.0.0-alpha.14",
     "@ledgerhq/hw-app-btc": "^5.38.0",
-    "@ledgerhq/hw-transport-node-hid": "^5.38.0",
     "@openapitools/openapi-generator-cli": "^2.1.16",
     "@polkadot/api": "^3.4.1",
     "@thorchain/asgardex-midgard": "^1.1.0",
@@ -149,5 +148,8 @@
     "ts-node": "^9.1.1",
     "wait-on": "^5.2.1",
     "webpack-cli": "^4.3.1"
+  },
+  "optionalDependencies": {
+    "@ledgerhq/hw-transport-node-hid": "^5.38.0"
   }
 }
