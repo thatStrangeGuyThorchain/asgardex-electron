@@ -1,6 +1,6 @@
 const path = require('path')
 
-// const nodeExternals = require('webpack-node-externals')
+const nodeExternals = require('webpack-node-externals')
 
 const common = (_ /* env */, argv) => ({
   output: {
@@ -25,14 +25,7 @@ const common = (_ /* env */, argv) => ({
     __dirname: false,
     __filename: false
   },
-  // externals: [nodeExternals()]
-  // Add `node-hid` to externals dure build issues - see https://github.com/thorchain/asgardex-electron/pull/881
-  // https://webpack.js.org/configuration/externals/#root
-  // Note: ^ Disabled temporary due sign issues on macOS
-  externals: {
-    'node-hid': 'commonjs node-hid',
-    usb: 'commonjs usb'
-  }
+  externals: [nodeExternals()]
 })
 
 const main = (env, arg) => {
