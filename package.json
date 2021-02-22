@@ -10,12 +10,13 @@
     "dev:app": "cross-env BROWSER=none yarn start:web",
     "dev:electron": "wait-on http://localhost:3000 && nodemon -I --watch ./src/main/ --exec electron ./public/dev.js",
     "build": "cross-env CI=false PUBLIC_URL=./ craco build",
+    "build:electron": "electron-rebuild -f -w usb",
     "prebuild": "webpack --config webpack.main.js --mode production",
     "test": "craco test",
     "package": "yarn build && yarn package:electron",
     "package:electron": "electron-builder build -c.extraMetadata.main=build/electron.js --config .electronbuildrc",
     "package:ci": "yarn postinstall && yarn build && yarn package:electron --publish always",
-    "postinstall": "node scripts/fix.sr25519.js && electron-builder install-app-deps",
+    "postinstall": "node scripts/fix.sr25519.js && electron-builder install-app-deps && yarn build:electron",
     "lint": "eslint \"{src,e2e,}/**/*.{ts,tsx}\" --fix",
     "_test:e2e": "yarn build && yarn test:cafe",
     "test:cafe": "cross-env NODE_ENV=production testcafe electron:./ ./e2e/**/*.e2e.ts",
@@ -56,7 +57,6 @@
     "@devexperts/rx-utils": "^1.0.0-alpha.14",
     "@devexperts/utils": "^1.0.0-alpha.14",
     "@ledgerhq/hw-app-btc": "^5.38.0",
-    "@ledgerhq/hw-transport-node-hid": "^5.38.0",
     "@openapitools/openapi-generator-cli": "^2.1.16",
     "@polkadot/api": "^3.4.1",
     "@thorchain/asgardex-midgard": "^1.1.0",
@@ -133,6 +133,7 @@
     "electron-builder": "^22.9.1",
     "electron-devtools-installer": "^3.1.1",
     "electron-notarize": "^1.0.0",
+    "electron-rebuild": "1.11.0",
     "eslint-config-prettier": "^7.1.0",
     "eslint-plugin-prettier": "^3.3.1",
     "git-revision-webpack-plugin": "^3.0.6",
@@ -150,5 +151,8 @@
     "wait-on": "^5.2.1",
     "webpack-cli": "^4.3.1",
     "webpack-node-externals": "^1.7.2"
+  },
+  "optionalDependencies": {
+    "@ledgerhq/hw-transport-node-hid": "^5.38.0"
   }
 }
