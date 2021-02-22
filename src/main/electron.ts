@@ -96,6 +96,7 @@ const initMainWindow = async () => {
       // Disable `remote` module
       // https://www.electronjs.org/docs/tutorial/security#15-disable-the-remote-module
       enableRemoteModule: false,
+      // experimentalFeatures: true,
       // preload script
       preload: join(__dirname, IS_DEV ? '../../public/' : '../build/', 'preload.js')
     }
