@@ -158,6 +158,7 @@ const init = async () => {
   autoUpdater
     .checkForUpdates()
     .then((info) => {
+      console.log('test')
       mainWindow?.webContents.send(IPCMessages.LOG, 'checkForUpdates')
       if (!info) {
         mainWindow?.webContents.send(IPCMessages.UPDATE_AVAILABLE, false)
