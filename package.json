@@ -1,7 +1,7 @@
 {
   "name": "asgardex",
   "productName": "ASGARDEX",
-  "version": "v0.1.0-alpha.13",
+  "version": "v0.1.0-alpha.14",
   "description": "WALLET AND EXCHANGE CLIENT FOR THORCHAIN",
   "main": "public/electron.js",
   "scripts": {
@@ -33,19 +33,19 @@
   },
   "author": {
     "name": "ASGARDEX Maintainers",
-    "email": "accounts@thorchain.org",
+    "email": "thatStrangeGuyThorchain@protonmail.com",
     "url": "https://thorchain.org"
   },
   "contributors": [
     {
       "name": "THORChain Admin",
-      "email": "accounts@thorchain.org",
+      "email": "thatStrangeGuyThorchain@protonmail.com",
       "url": "https://thorchain.org"
     }
   ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/thorchain/asgardex/issues"
+    "url": "https://github.com/thatStrangeGuyThorchain/asgardex/issues"
   },
   "keywords": [
     "thorchain",
